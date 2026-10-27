@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Lint
+        run: |
+          python -m ruff check .
+          python -m ruff format --check .
+      - name: Test
+        run: python -m pytest
+      - name: Exercise the example machines
+        run: |
+          python -m workflow_state_machine validate examples/order-fulfilment.json
+          python -m workflow_state_machine run examples/order-fulfilment.json --events pay,pack,ship,deliver
+          python -m workflow_state_machine path examples/order-fulfilment.json --to cancelled
+          python -m workflow_state_machine graph examples/order-fulfilment.json
+          python -m workflow_state_machine validate examples/leaky-process.json || echo "problems reported as expected"
