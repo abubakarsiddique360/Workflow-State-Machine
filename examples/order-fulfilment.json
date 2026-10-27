@@ -1,0 +1,24 @@
+{
+  "name": "Order fulfilment",
+  "initial": "created",
+  "states": [
+    { "name": "created", "description": "Order accepted, payment not captured yet" },
+    { "name": "paid" },
+    { "name": "packed" },
+    { "name": "shipped" },
+    { "name": "on_hold", "description": "Waiting for a manual review" },
+    { "name": "delivered", "terminal": true },
+    { "name": "cancelled", "terminal": true }
+  ],
+  "transitions": [
+    { "from": "created", "event": "pay", "to": "paid" },
+    { "from": "created", "event": "cancel", "to": "cancelled" },
+    { "from": "paid", "event": "pack", "to": "packed" },
+    { "from": "paid", "event": "hold", "to": "on_hold" },
+    { "from": "paid", "event": "refund", "to": "cancelled" },
+    { "from": "on_hold", "event": "release", "to": "paid" },
+    { "from": "packed", "event": "ship", "to": "shipped" },
+    { "from": "shipped", "event": "deliver", "to": "delivered" },
+    { "from": "shipped", "event": "return", "to": "cancelled" }
+  ]
+}

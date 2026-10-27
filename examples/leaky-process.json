@@ -1,0 +1,17 @@
+{
+  "name": "Leaky review process",
+  "initial": "draft",
+  "states": [
+    { "name": "draft" },
+    { "name": "review" },
+    { "name": "approved", "terminal": true },
+    { "name": "archived" },
+    { "name": "orphan", "description": "Nothing points here, so it can never happen" }
+  ],
+  "transitions": [
+    { "from": "draft", "event": "submit", "to": "review" },
+    { "from": "review", "event": "approve", "to": "approved" },
+    { "from": "review", "event": "retry", "to": "review" },
+    { "from": "approved", "event": "archive", "to": "archived" }
+  ]
+}
